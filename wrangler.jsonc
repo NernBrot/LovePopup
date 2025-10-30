@@ -1,5 +1,6 @@
 {
   "name": "lovepopup",
+  "main": "index.html",
   "compatibility_date": "2025-10-30",
   "assets": {
     "directory": "./"
