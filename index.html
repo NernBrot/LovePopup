@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LovePro</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background-color: #ffe4ec; /* 浅粉背景 */
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+  }
+
+  .love {
+    position: absolute;
+    font-weight: 600;
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+    opacity: 0;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: #fff; /* 完全不透明的白色背景 */
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    transform-origin: center center;
+    transition: transform 1.5s ease, opacity 1.2s ease;
+    z-index: 9999;
+  }
+
+  /* 轻微放大动画 */
+  @keyframes gentleGrow {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+  }
+
+  /* 轻微缩小动画 */
+  @keyframes gentleShrink {
+    0% { transform: translate(-50%, -50%) scale(1.15); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<script>
+  /** 参数配置 **/
+  const INTERVAL = 200; // 生成间隔（毫秒）
+  const MAX_COUNT = 500; // 最大数量
+  const DURATION = 1200; // 动画持续时间（毫秒）
+
+const phrases = [
+  "我想你了。",
+  "期待下一次见面。",
+  "记得好好吃饭。",
+  "别熬夜，早点休息。",
+  "我很想你。",
+  "要好好爱自己呀。",
+  "希望你每天都顺顺利利。",
+  "今天也要开开心心的。",
+  "不管多忙，也要照顾好自己。",
+  "天气变凉了，记得多穿点。",
+  "不要给自己太大压力，一切都会好起来的。",
+  "早安呀，新的一天要元气满满！",
+  "晚安，好梦要和我有关。",
+  "多喝热水，别老喝冷饮。",
+  "记得多笑笑，你笑起来最好看。",
+  "无论多远，我都在想你。",
+  "希望你今天被温柔对待。",
+  "有空就多休息，别太累了。",
+  "想你平安喜乐，万事顺心。",
+  "每天都要比昨天更幸福一点。"
+];
+
+
+  const colors = [
+    "#ff3d7f", "#ff5f93", "#ff80ab", "#f06292",
+    "#ec407a", "#e91e63", "#d81b60", "#f50057"
+  ];
+
+  let activeCount = 0;
+
+  function random(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function spawnLove() {
+    if (activeCount > MAX_COUNT) return;
+    activeCount++;
+
+    const el = document.createElement("div");
+    el.className = "love";
+    el.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const x = random(0, vw);
+    const y = random(0, vh);
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+
+    // 随机样式
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const fontSize = random(14, 22);
+    el.style.color = color;
+    el.style.fontSize = `${fontSize}px`;
+
+    // 随机动画
+    const anim = Math.random() > 0.5 ? "gentleGrow" : "gentleShrink";
+    const dur = random(DURATION * 0.9, DURATION * 1.2);
+    el.style.animation = `${anim} ${dur}ms ease forwards`;
+
+    document.body.appendChild(el);
+  }
+
+  // 定时生成
+  setInterval(spawnLove, INTERVAL);
+</script>
+
+</body>
+</html>
