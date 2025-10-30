@@ -3,43 +3,82 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Love Pro</title>
+<title>LovePro</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
 <style>
   html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
     overflow: hidden;
-    background-color: #ffe4ec; /* 浅粉背景 */
-    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    background-color: #000;
+    height: 100%;
+    font-family: "Microsoft YaHei", sans-serif;
   }
 
-  .love {
+  .popup {
     position: absolute;
-    font-weight: 600;
-    white-space: nowrap;
+    width: 250px;
+    height: 60px;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    background-color: #fff;
+    overflow: hidden;
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  .titlebar {
+    background-color: #e5e5e5;
+    height: 20px;
+    line-height: 20px;
+    font-size: 12px;
+    color: #333;
+    padding: 0 6px;
+    font-weight: bold;
+    border-bottom: 1px solid #bbb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     user-select: none;
-    pointer-events: none;
-    opacity: 0;
-    padding: 10px 16px;
-    border-radius: 10px;
-    background: #fff; /* 完全不透明的白色背景 */
-    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-    transform-origin: center center;
-    transition: transform 1.5s ease, opacity 1.2s ease;
-    z-index: 9999;
   }
 
-  /* 轻微放大动画 */
-  @keyframes gentleGrow {
-    0% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
-    100% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+  .title-left {
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
-  /* 轻微缩小动画 */
-  @keyframes gentleShrink {
-    0% { transform: translate(-50%, -50%) scale(1.15); opacity: 0; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  /* favicon 图标样式 */
+  .icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .close-btn {
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    margin-left: 6px;
+    transition: color 0.2s ease;
+  }
+
+  .close-btn:hover {
+    color: red;
+  }
+
+  .content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100% - 20px);
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
   }
 </style>
 </head>
@@ -48,36 +87,23 @@
 <script>
   /** 参数配置 **/
   const INTERVAL = 200; // 生成间隔（毫秒）
-  const MAX_COUNT = 500; // 最大数量
-  const DURATION = 1200; // 动画持续时间（毫秒）
+  const MAX_COUNT = 500; // 最大弹窗数
+  const WINDOW_WIDTH = 250;
+  const WINDOW_HEIGHT = 60;
 
-const phrases = [
-  "我想你了。",
-  "期待下一次见面。",
-  "记得好好吃饭。",
-  "别熬夜，早点休息。",
-  "我很想你。",
-  "要好好爱自己呀。",
-  "希望你每天都顺顺利利。",
-  "今天也要开开心心的。",
-  "不管多忙，也要照顾好自己。",
-  "天气变凉了，记得多穿点。",
-  "不要给自己太大压力，一切都会好起来的。",
-  "早安呀，新的一天要元气满满！",
-  "晚安，好梦要和我有关。",
-  "多喝热水，别老喝冷饮。",
-  "记得多笑笑，你笑起来最好看。",
-  "无论多远，我都在想你。",
-  "希望你今天被温柔对待。",
-  "有空就多休息，别太累了。",
-  "想你平安喜乐，万事顺心。",
-  "每天都要比昨天更幸福一点。"
-];
+  const tips = [
+    "多喝水哦~", "保持微笑呀~", "每天都要元气满满~",
+    "记得吃水果~", "保持好心情~", "好好爱自己~",
+    "我想你了~", "梦想成真~", "期待下一次见面~",
+    "顺顺利利~", "早点休息~", "愿所有烦恼都消失~",
+    "别熬夜~", "今天过得开心嘛~", "天冷了，多穿衣服~"
+  ];
 
-
-  const colors = [
-    "#ff3d7f", "#ff5f93", "#ff80ab", "#f06292",
-    "#ec407a", "#e91e63", "#d81b60", "#f50057"
+  const bgColors = [
+    'lightpink', 'skyblue', 'lightblue', 'lightsteelblue', 'powderblue',
+    'lightcyan', 'aliceblue', 'azure', 'lightgreen', 'lavender',
+    'lightyellow', 'plum', 'coral', 'bisque', 'aquamarine',
+    'mistyrose', 'honeydew', 'lavenderblush', 'oldlace'
   ];
 
   let activeCount = 0;
@@ -86,39 +112,63 @@ const phrases = [
     return Math.random() * (max - min) + min;
   }
 
-  function spawnLove() {
+  function createPopup() {
     if (activeCount > MAX_COUNT) return;
     activeCount++;
 
-    const el = document.createElement("div");
-    el.className = "love";
-    el.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+    const popup = document.createElement('div');
+    popup.className = 'popup';
+    popup.style.backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
 
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const x = random(0, vw);
-    const y = random(0, vh);
-    el.style.left = `${x}px`;
-    el.style.top = `${y}px`;
+    const screenW = window.innerWidth;
+    const screenH = window.innerHeight;
+    const x = random(0, screenW - WINDOW_WIDTH);
+    const y = random(0, screenH - WINDOW_HEIGHT);
+    popup.style.left = `${x}px`;
+    popup.style.top = `${y}px`;
 
-    // 随机样式
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    const fontSize = random(14, 22);
-    el.style.color = color;
-    el.style.fontSize = `${fontSize}px`;
+    // 标题栏
+    const title = document.createElement('div');
+    title.className = 'titlebar';
 
-    // 随机动画
-    const anim = Math.random() > 0.5 ? "gentleGrow" : "gentleShrink";
-    const dur = random(DURATION * 0.9, DURATION * 1.2);
-    el.style.animation = `${anim} ${dur}ms ease forwards`;
+    const titleLeft = document.createElement('div');
+    titleLeft.className = 'title-left';
 
-    document.body.appendChild(el);
+    // 使用 favicon.ico 图标
+    const icon = document.createElement('img');
+    icon.src = 'favicon.ico';
+    icon.className = 'icon';
+    icon.alt = 'icon';
+
+    const titleText = document.createElement('span');
+    titleText.textContent = '温馨提示';
+
+    titleLeft.appendChild(icon);
+    titleLeft.appendChild(titleText);
+
+    const closeBtn = document.createElement('span');
+    closeBtn.className = 'close-btn';
+    closeBtn.textContent = '×';
+    closeBtn.onclick = () => {
+      popup.remove();
+      activeCount--;
+    };
+
+    title.appendChild(titleLeft);
+    title.appendChild(closeBtn);
+
+    // 内容部分
+    const content = document.createElement('div');
+    content.className = 'content';
+    content.textContent = tips[Math.floor(Math.random() * tips.length)];
+
+    popup.appendChild(title);
+    popup.appendChild(content);
+    document.body.appendChild(popup);
   }
 
-  // 定时生成
-  setInterval(spawnLove, INTERVAL);
+  setInterval(createPopup, INTERVAL);
 </script>
 
 </body>
 </html>
-
